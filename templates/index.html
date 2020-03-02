@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+{#    <link rel="stylesheet" href="/static/css/index.css"/>#}
+    <link rel="stylesheet" href="{% static '../static/index.css' %} "/>
+</head>
+<body>
+<ul id="list1">
+    {% for eq in eqInfo%}
+        <li class="row_div">
+            <span>{{ eq.Cata_id }}</span>
+            <span>{{ eq.O_time|date:'Y-m-d H:i' }}</span>
+            <span>{{ eq.Location_cname }}</span>
+            <span>{{ eq.M }}</span>
+            <span>{{ eq.Depth }}</span>
+            <span>{{ eq.Lon }}</span>
+            <span>{{ eq.Lat }}</span>
+        </li>
+    {% endfor %}
+</ul>
+</body>
+</html>
