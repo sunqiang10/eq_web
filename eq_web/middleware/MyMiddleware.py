@@ -8,7 +8,7 @@ import json
 from eq_web.model.eq_info import EqInfo
 import threading
 import django.db as django_db
-
+import requests
 
 class MyMiddleware(MiddlewareMixin):
     pass
@@ -35,18 +35,26 @@ try:
             if django_db:
                 django_db.close_old_connections()
                 print('关闭数据库连接')
-            pool = redis.ConnectionPool(host='127.0.0.1', port=6379)
+            pool = redis.ConnectionPool(host='127.0.0.1', port=6379, password=123)
             r = redis.Redis(connection_pool=pool)
+
+            proxy_url = 'http://api.wandoudl.com/api/ip?app_key=4220f3e90dd3cf7a26cd9d891ac45597&pack=0&num=1&xy=1&type=1&lb=\r\n&mr=1&'
+            response = requests.get(url=proxy_url).content
+            ips = str(response, "utf-8")
+            print(ips)
+            r.sadd("proxy_set", 'http://'+ips)
+
             print('r.llen:crawler_ceic_redis:items', r.llen('crawler_ceic_redis:items'))
             for i in range(r.llen('crawler_ceic_redis:items')):
                 item = r.lpop('crawler_ceic_redis:items')
-                logging.info(item.decode('unicode_escape'))
-                rs = json.loads(item.decode('unicode_escape'))
-                eq = EqInfo(**rs)
-                is_had_eq = EqInfo.objects.filter(Cata_id=eq.Cata_id)
-                if not is_had_eq:
-                    eq.save()
-                    logging.info("eq.save(" + eq.Cata_id + ")")
+                if item:
+                    print(item.decode('unicode_escape'))
+                    rs = json.loads(item.decode('unicode_escape'))
+                    eq = EqInfo(**rs)
+                    is_had_eq = EqInfo.objects.filter(Cata_id=eq.Cata_id)
+                    if not is_had_eq:
+                        eq.save()
+                        print("eq.save(" + eq.Cata_id + ")")
             global chooseC
             if chooseC == 1:
                 chooseC = 0
@@ -62,8 +70,6 @@ try:
                 django_db.close_old_connections()
                 print('关闭数据库连接')
             mylock.release()
-
-
     my_job()
     register_events(scheduler)
     scheduler.start()

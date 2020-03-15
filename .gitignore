@@ -192,8 +192,9 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 config.py
 settings.py
-venv/**
+venv*/**
 .DS_Store
 .idea/**
 __pycache__/
 static/img/
+proxy_config.txt
